@@ -1,0 +1,32 @@
+.sideNav {
+  position: absolute;
+  left: 0;
+  top: 0;
+  text-align: left;
+}
+
+.navToggle {
+  background-color: transparent;
+  border: none;
+}
+
+.navToggle img {
+  width: 50px;
+  filter: invert(1);
+}
+
+.sideNavContent {
+  background-color: #444;
+  margin: 0;
+  padding: 15px;
+  width: 260px;
+  position: relative;
+  left: -260px;
+  transition: left 0.2s ease;
+  max-height: calc(100vh - 100px);
+  overflow: auto;
+}
+
+.sideNavContent.open {
+  left: 0;
+}

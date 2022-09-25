@@ -1,0 +1,12 @@
+.character {
+}
+
+.imageContainer {
+  width: 200px;
+  height: 200px;
+  overflow: hidden;
+}
+
+.character img {
+  width: 200px;
+}
