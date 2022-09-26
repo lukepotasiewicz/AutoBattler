@@ -38,12 +38,12 @@ export const hexTile = (xPos, zPos, size, row, column) => {
 
 export const longHexRow = (xPos, zPos, row) => {
   for (let i = 0; i < 9; i++) {
-    hexTile(i * (4 + 0.2) - xPos, zPos, 4, row, i);
+    hexTile(i * (4 + 0.2) - xPos, zPos, 4, row, i * 2);
   }
 };
 
 export const shortHexRow = (xPos, zPos, row) => {
   for (let i = 0; i < 8; i++) {
-    hexTile(i * (4 + 0.2) - xPos, zPos, 4, row, i);
+    hexTile(i * (4 + 0.2) - xPos, zPos, 4, row, i * 2 + 1);
   }
 };

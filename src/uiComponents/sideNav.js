@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { game } from "../App";
 import { characters } from "../data/characters";
 import PartyIcon from "../images/party.png";
 import { Character } from "./character";
@@ -6,6 +7,7 @@ import "./sideNav.css";
 
 export const SideNav = () => {
   const [open, setOpen] = useState(false);
+  game.blocked = open;
 
   return (
     <div className="sideNav">
@@ -16,8 +18,8 @@ export const SideNav = () => {
         <img src={PartyIcon} alt="Party" />
       </button>
       <div className={`sideNavContent ${open ? "open" : ""}`}>
-        {Object.values(characters).map((character) => (
-          <Character character={character} />
+        {Object.values(characters).map((character, i) => (
+          <Character character={character} key={character.name + i} />
         ))}
       </div>
     </div>

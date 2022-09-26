@@ -2,8 +2,9 @@ import "./App.css";
 import * as THREE from "three";
 import { longHexRow, shortHexRow } from "./gameComponents/hexTile";
 import { boardPiece } from "./gameComponents/boardPiece";
-import { boardSetup } from "./gameComponents/enviornment";
+import { enviornmentSetup } from "./gameComponents/enviornment";
 import { SideNav } from "./uiComponents/sideNav";
+import { characters } from "./data/characters";
 
 export const game = {
   scene: {},
@@ -13,14 +14,18 @@ export const game = {
 const getSelectedPiece = () => game.hexTiles.selected?.piece;
 const setSelected = (selected) => (game.hexTiles.selected = selected);
 const getSelectedHex = () => game.hexTiles.selected?.hex;
+const getHoveredTile = () =>
+  game.hexTiles[game.hexTiles?.hovered?.row]?.[game.hexTiles?.hovered?.column];
 
 const grabPiece = () => {
-  setSelected(
-    game.hexTiles[game.hexTiles.hovered.row][game.hexTiles.hovered.column]
-  );
+  if (getHoveredTile()?.piece?.team === 0) setSelected(getHoveredTile());
 };
 const dropPiece = () => {
-  if (game.hexTiles.hovered) {
+  if (
+    game.hexTiles.hovered &&
+    !getHoveredTile()?.piece &&
+    game.hexTiles?.hovered?.row < 4
+  ) {
     getSelectedPiece().position.x = game.hexTiles.hovered.position.x;
     getSelectedPiece().position.z = game.hexTiles.hovered.position.z;
 
@@ -32,6 +37,9 @@ const dropPiece = () => {
       game.hexTiles.hovered.column
     ].piece = selectedPiece;
 
+    selectedPiece.row = game.hexTiles.hovered.row;
+    selectedPiece.column = game.hexTiles.hovered.column;
+
     setSelected(null);
   } else {
     getSelectedPiece().position.x = getSelectedHex().position.x;
@@ -40,33 +48,38 @@ const dropPiece = () => {
   }
 };
 
-boardSetup();
+enviornmentSetup();
 
-longHexRow(16.8, 2.8, 0);
-shortHexRow(14.8, 6, 1);
-longHexRow(16.8, 9.2, 2);
-shortHexRow(14.8, 12.4, 3);
+longHexRow(16.8, -10, 7);
+shortHexRow(14.8, -6.8, 6);
+longHexRow(16.8, -3.6, 5);
+shortHexRow(14.8, -0.4, 4);
 
-game.hexTiles[0][0].piece = boardPiece(2, -5);
+longHexRow(16.8, 2.8, 3);
+shortHexRow(14.8, 6, 2);
+longHexRow(16.8, 9.2, 1);
+shortHexRow(14.8, 12.4, 0);
+
+boardPiece(5, 0, characters.KingsGuard, 1);
+boardPiece(5, 8, characters.KingsGuard, 1);
+boardPiece(5, 16, characters.KingsGuard, 1);
+boardPiece(0, 5, characters.Paladin);
 
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 
 const onPointerMove = (event) => {
-  // calculate pointer position in normalized device coordinates
-  // (-1 to +1) for both components
-
   pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
   pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
 };
 
 const onMouseDown = (event) => {
-  if (game.hexTiles.hovered) {
+  if (game.hexTiles.hovered && !game.blocked) {
     grabPiece();
   }
 };
 const onMouseUp = (event) => {
-  if (getSelectedPiece()) {
+  if (getSelectedPiece() && !game.blocked) {
     dropPiece();
   }
 };
@@ -94,6 +107,16 @@ function animate() {
 
   let onTile = false;
   for (let i = 0; i < intersects.length; i++) {
+    if (
+      intersects[i].object.name === "hexTile" ||
+      intersects[i].object.name === "board"
+    ) {
+      game.mousePos = new THREE.Vector3(
+        intersects[i].point.x,
+        0,
+        intersects[i].point.z
+      );
+    }
     if (intersects[i].object.name === "hexTile") {
       onTile = true;
 
@@ -106,11 +129,6 @@ function animate() {
       }
 
       game.hexTiles.hovered = intersects[i].object;
-      game.mousePos = new THREE.Vector3(
-        intersects[i].point.x,
-        0,
-        intersects[i].point.z
-      );
     }
   }
   if (!onTile && game.hexTiles.hovered) {
@@ -120,10 +138,18 @@ function animate() {
 }
 animate();
 
+const fight = () => {
+  console.log(game);
+  Object.values(game.pieces).forEach((piece) => piece.action());
+};
+
 function App() {
   return (
     <div className="App">
       <SideNav />
+      <button className="startButton" onClick={fight}>
+        Start
+      </button>
     </div>
   );
 }

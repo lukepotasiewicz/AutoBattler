@@ -2,7 +2,7 @@ import * as THREE from "three";
 import background1 from "../images/background1.jpg";
 import { game } from "../App";
 
-export const boardSetup = () => {
+export const enviornmentSetup = () => {
   game.scene = new THREE.Scene();
   game.camera = new THREE.PerspectiveCamera(
     75,
@@ -17,27 +17,27 @@ export const boardSetup = () => {
   game.renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(game.renderer.domElement);
 
-  const geometry = new THREE.BoxGeometry(1, 1, 1);
-  const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-  const cube = new THREE.Mesh(geometry, material);
-  game.scene.add(cube);
-
   game.renderer.shadowMap.enabled = true;
   game.renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
 
   //Create a DirectionalLight and turn on shadows for the light
   const light = new THREE.DirectionalLight(0xffffff, 1);
-  light.position.set(0, 1, 0); //default; light shining from top
+  light.position.set(0.5, 1, 0.5); //default; light shining from top
   light.castShadow = true; // default false
   game.scene.add(light);
   const ambientLight = new THREE.AmbientLight(0x404040); // soft white light
   game.scene.add(ambientLight);
 
   //Set up shadow properties for the light
-  light.shadow.mapSize.width = 512; // default
-  light.shadow.mapSize.height = 512; // default
-  light.shadow.camera.near = 0.5; // default
-  light.shadow.camera.far = 500; // default
+  light.shadow.mapSize.width = 1024; // default
+  light.shadow.mapSize.height = 1024; // default
+  light.shadow.camera.near = -3; // default
+  light.shadow.camera.far = 30; // default
+
+  light.shadow.camera.top = 20;
+  light.shadow.camera.bottom = -30;
+  light.shadow.camera.left = -24;
+  light.shadow.camera.right = 20;
 
   const loader = new THREE.TextureLoader();
   const texture = loader.load(background1);
@@ -50,6 +50,7 @@ export const boardSetup = () => {
   const planeMaterial = new THREE.MeshStandardMaterial({ map: texture });
   const plane = new THREE.Mesh(planeGeometry, planeMaterial);
   plane.receiveShadow = true;
+  plane.name = "board";
   plane.rotation.x = -1.57;
   plane.position.y = -10;
   game.scene.add(plane);
