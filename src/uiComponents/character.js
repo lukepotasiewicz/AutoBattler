@@ -13,7 +13,7 @@ export const Character = ({ character }) => {
           while (game.hexTiles[0][i].piece) {
             i += 2;
           }
-          boardPiece(0, i, character);
+          boardPiece(0, i, { ...character });
         }}
       >
         +

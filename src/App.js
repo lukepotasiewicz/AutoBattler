@@ -10,6 +10,7 @@ export const game = {
   scene: {},
   hexTiles: {},
   pieces: {},
+  damageParticles: [],
 };
 const getSelectedPiece = () => game.hexTiles.selected?.piece;
 const setSelected = (selected) => (game.hexTiles.selected = selected);
@@ -60,9 +61,9 @@ shortHexRow(14.8, 6, 2);
 longHexRow(16.8, 9.2, 1);
 shortHexRow(14.8, 12.4, 0);
 
-boardPiece(5, 0, characters.KingsGuard, 1);
-boardPiece(5, 8, characters.KingsGuard, 1);
-boardPiece(5, 16, characters.KingsGuard, 1);
+boardPiece(7, 0, characters.KingsGuard, 1);
+boardPiece(7, 8, characters.KingsGuard, 1);
+boardPiece(7, 16, characters.KingsGuard, 1);
 boardPiece(0, 5, characters.Paladin);
 
 const raycaster = new THREE.Raycaster();
@@ -90,7 +91,19 @@ window.addEventListener("mouseup", onMouseUp);
 
 function animate() {
   requestAnimationFrame(animate);
+  const currentTime = Date.now();
   game.renderer.render(game.scene, game.camera);
+
+  Object.values(game.pieces).forEach((piece) => piece && piece.tween());
+
+  game.damageParticles.forEach((particle, i) => {
+    game.damageParticles[i].pos.y -=
+      (currentTime - particle.startTime) / -150 + 2;
+    game.damageParticles[i].pos.x += particle.random / 2;
+    particle.element.style.top = particle.pos.y + "px";
+    particle.element.style.left = particle.pos.x + "px";
+  });
+
   if (game.camera.position.z < 30) {
     game.camera.position.z += (30.1 - game.camera.position.z) / 25;
   }

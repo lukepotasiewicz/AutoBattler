@@ -52,3 +52,11 @@ html {
   background-color: white;
   color: #444;
 }
+
+.damageTag {
+  position: absolute;
+  color: #f44;
+  font-weight: bold;
+  text-shadow: 0 0 3px black;
+  /* transition: all 1s ease; */
+}

@@ -15,6 +15,8 @@ export const boardPiece = (row, column, character, team = 0) => {
   piece.castShadow = true;
   piece.receiveShadow = true;
   piece.position.y = -9.4;
+  piece.name = character.name;
+  piece.character = character;
   game.scene.add(piece);
 
   // piece image
@@ -57,6 +59,7 @@ export const boardPiece = (row, column, character, team = 0) => {
 
   // actions
   let health = character.health;
+  piece.damageParticles = [];
   piece.takeDamage = (damage) => {
     const reducedDamage = (damage * (7 - Math.log(character.defence / 10))) / 7;
     health -= reducedDamage;
@@ -67,9 +70,45 @@ export const boardPiece = (row, column, character, team = 0) => {
       game.hexTiles[piece.row][piece.column].piece = undefined;
       game.pieces[piece.id] = undefined;
       game.scene.remove(piece);
+      const allies = Object.values(game.pieces).filter(
+        (enemy) => enemy && enemy.team === team
+      );
+      allies.forEach(
+        (ally) => ally.name === "Viking" && (ally.character.attackSpeed *= 1.3)
+      );
+      console.log(allies);
     }
     healthBar.scale.x = health / character.health;
     healthBar.position.x -= (reducedDamage * 1.08) / character.health;
+
+    let pos = new THREE.Vector3();
+    pos = pos.setFromMatrixPosition(piece.matrixWorld);
+    pos.project(game.camera);
+
+    let widthHalf = window.innerWidth / 2;
+    let heightHalf = window.innerHeight / 2;
+
+    pos.x = pos.x * widthHalf + widthHalf;
+    pos.y = -(pos.y * heightHalf) + heightHalf;
+    pos.z = 0;
+
+    const damageText = document.createElement("div");
+    damageText.classList.add("damageTag");
+    damageText.innerHTML = Math.round(reducedDamage);
+    damageText.style.top = pos.y + "px";
+    damageText.style.left = pos.x + "px";
+    document.body.appendChild(damageText);
+    game.damageParticles.push({
+      element: damageText,
+      startTime: Date.now(),
+      random: Math.random() - 0.5,
+      pos,
+    });
+
+    setTimeout(() => {
+      damageText.remove();
+      piece.damageParticles.pop();
+    }, 500);
   };
 
   piece.action = () => {
@@ -137,9 +176,6 @@ export const boardPiece = (row, column, character, team = 0) => {
         [0, -2],
         [1, -1],
       ][Math.floor(angle / 60)];
-      console.log("Start looking -------", character.name);
-      console.log(angle);
-      console.log(!!targetTile?.piece);
       targetTile =
         game.hexTiles?.[piece.row + direction[0]]?.[
           piece.column + direction[1]
@@ -149,10 +185,13 @@ export const boardPiece = (row, column, character, team = 0) => {
     } while (!!targetTile?.piece && i < 6);
 
     if (targetTile && !targetTile.piece) {
-      console.log("FOUND PATH! -------", character.name);
       // move piece
-      piece.position.x = targetTile.hex.position.x;
-      piece.position.z = targetTile.hex.position.z;
+      piece.targetPosition = new THREE.Vector3(
+        targetTile.hex.position.x,
+        0,
+        targetTile.hex.position.z
+      );
+      piece.movementEndTime = Date.now() + character.speed * 1000;
 
       // remove hex's piece
       game.hexTiles[piece.row][piece.column].piece = undefined;
@@ -161,12 +200,29 @@ export const boardPiece = (row, column, character, team = 0) => {
       piece.column = targetTile.hex.column;
       // set new hex's piece
       game.hexTiles[piece.row][piece.column].piece = piece;
-    } else {
-      console.log("failed! -------", character.name);
     }
 
     setTimeout(piece.action, (1 / character.speed) * 1000);
     return;
+  };
+
+  piece.tween = () => {
+    const currentTime = Date.now();
+    const weight =
+      character.speed /
+      20 /
+      (piece.movementEndTime / 1000 - currentTime / 1000);
+    if (piece.targetPosition && piece.targetPosition.x !== piece.position.x) {
+      if (piece.movementEndTime < currentTime) {
+        piece.position.z = piece.targetPosition.z;
+        piece.targetPosition = null;
+      } else {
+        piece.position.x =
+          piece.targetPosition.x * weight + piece.position.x * (1 - weight);
+        piece.position.z =
+          piece.targetPosition.z * weight + piece.position.z * (1 - weight);
+      }
+    }
   };
 
   // add to board
