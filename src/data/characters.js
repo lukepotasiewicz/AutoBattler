@@ -3,6 +3,9 @@ import Mage from "../images/characters/mage.png";
 import Viking from "../images/characters/viking.jpg";
 import KingsGuard from "../images/characters/KingsGuard.jpg";
 
+import PaladinObj from "../models/paladin/paladin8.glb";
+import VikingObj from "../models/viking/viking.glb";
+
 const images = {
   Paladin,
   Mage,
@@ -19,6 +22,8 @@ const charFactory = (name) => ({
 export const characters = {
   Paladin: {
     ...charFactory("Paladin"),
+    model: PaladinObj,
+    scale: 2.4,
     health: 100,
     damage: 5,
     attackSpeed: 1.1,
@@ -29,6 +34,8 @@ export const characters = {
   },
   Mage: {
     ...charFactory("Mage"),
+    model: PaladinObj,
+    scale: 1.4,
     health: 50,
     damage: 8,
     attackSpeed: 0.4,
@@ -39,16 +46,20 @@ export const characters = {
   },
   Viking: {
     ...charFactory("Viking"),
+    model: VikingObj,
+    scale: 1.8,
     health: 80,
     damage: 4,
-    attackSpeed: 1.4,
+    attackSpeed: 2.4,
     speed: 1.3,
-    defence: 30,
+    defence: 300,
     magicDefence: 10,
     range: 1,
   },
   KingsGuard: {
     ...charFactory("KingsGuard"),
+    model: PaladinObj,
+    scale: 3,
     health: 120,
     damage: 30,
     attackSpeed: 0.6,

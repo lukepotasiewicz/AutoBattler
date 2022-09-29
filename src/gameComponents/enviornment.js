@@ -16,12 +16,13 @@ export const enviornmentSetup = () => {
   game.renderer = new THREE.WebGLRenderer();
   game.renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(game.renderer.domElement);
+  game.renderer.textureEncoding = THREE.sRGBEncoding;
 
   game.renderer.shadowMap.enabled = true;
-  game.renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+  game.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
   //Create a DirectionalLight and turn on shadows for the light
-  const light = new THREE.DirectionalLight(0xffffff, 1);
+  const light = new THREE.DirectionalLight(0xffffff, 1.5);
   light.position.set(0.5, 1, 0.5); //default; light shining from top
   light.castShadow = true; // default false
   game.scene.add(light);

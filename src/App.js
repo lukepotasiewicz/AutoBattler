@@ -5,12 +5,14 @@ import { boardPiece } from "./gameComponents/boardPiece";
 import { enviornmentSetup } from "./gameComponents/enviornment";
 import { SideNav } from "./uiComponents/sideNav";
 import { characters } from "./data/characters";
+import hdri from "./images/hdri.jpg";
 
 export const game = {
   scene: {},
   hexTiles: {},
   pieces: {},
   damageParticles: [],
+  loadedHdri: null,
 };
 const getSelectedPiece = () => game.hexTiles.selected?.piece;
 const setSelected = (selected) => (game.hexTiles.selected = selected);
@@ -64,7 +66,9 @@ shortHexRow(14.8, 12.4, 0);
 boardPiece(7, 0, characters.KingsGuard, 1);
 boardPiece(7, 8, characters.KingsGuard, 1);
 boardPiece(7, 16, characters.KingsGuard, 1);
+
 boardPiece(0, 5, characters.Paladin);
+boardPiece(0, 9, characters.Viking);
 
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
@@ -88,6 +92,11 @@ const onMouseUp = (event) => {
 window.addEventListener("pointermove", onPointerMove);
 window.addEventListener("mousedown", onMouseDown);
 window.addEventListener("mouseup", onMouseUp);
+
+const loadedHdri = new THREE.TextureLoader().load(hdri);
+loadedHdri.mapping = THREE.EquirectangularReflectionMapping;
+game.scene.background = loadedHdri;
+game.scene.enviornment = loadedHdri;
 
 function animate() {
   requestAnimationFrame(animate);
