@@ -11,8 +11,9 @@ export const enviornmentSetup = () => {
     1000
   );
   game.camera.position.z = 25;
-  game.camera.position.y = 14;
-  game.camera.rotation.x -= 0.6;
+  game.camera.position.y = 20;
+  game.camera.rotation.x -= 0.8;
+
   game.renderer = new THREE.WebGLRenderer();
   game.renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(game.renderer.domElement);
@@ -55,6 +56,14 @@ export const enviornmentSetup = () => {
   plane.rotation.x = -1.57;
   plane.position.y = -10;
   game.scene.add(plane);
+
+  document.querySelector("canvas").onwheel = (e) => {
+    game.camera.targetPosition = new THREE.Vector3(
+      0,
+      game.camera.position.y + e.deltaY / 100,
+      game.camera.position.z + e.deltaY / 200
+    );
+  };
 
   // Create a helper for the shadow camera (optional)
   // const helper = new THREE.CameraHelper(light.shadow.camera);

@@ -13,6 +13,7 @@ export const game = {
   pieces: {},
   damageParticles: [],
   loadedHdri: null,
+  started: false,
 };
 const getSelectedPiece = () => game.hexTiles.selected?.piece;
 const setSelected = (selected) => (game.hexTiles.selected = selected);
@@ -63,12 +64,16 @@ shortHexRow(14.8, 6, 2);
 longHexRow(16.8, 9.2, 1);
 shortHexRow(14.8, 12.4, 0);
 
-boardPiece(7, 0, characters.KingsGuard, 1);
-boardPiece(7, 8, characters.KingsGuard, 1);
-boardPiece(7, 16, characters.KingsGuard, 1);
+// boardPiece(7, 0, characters.KingsGuard.name, 1);
+// boardPiece(7, 8, characters.KingsGuard.name, 1);
+// boardPiece(7, 16, characters.KingsGuard.name, 1);
+// boardPiece(7, 2, characters.Paladin.name, 1);
+// boardPiece(7, 6, characters.Paladin.name, 1);
+// boardPiece(7, 10, characters.Paladin.name, 1);
+boardPiece(7, 14, characters.Paladin.name, 1);
 
-boardPiece(0, 5, characters.Paladin);
-boardPiece(0, 9, characters.Viking);
+// boardPiece(0, 5, characters.Paladin.name);
+boardPiece(0, 9, characters.Viking.name);
 
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
@@ -79,7 +84,7 @@ const onPointerMove = (event) => {
 };
 
 const onMouseDown = (event) => {
-  if (game.hexTiles.hovered && !game.blocked) {
+  if (game.hexTiles.hovered && !game.blocked && !game.started) {
     grabPiece();
   }
 };
@@ -113,8 +118,14 @@ function animate() {
     particle.element.style.left = particle.pos.x + "px";
   });
 
-  if (game.camera.position.z < 30) {
-    game.camera.position.z += (30.1 - game.camera.position.z) / 25;
+  if (
+    game.camera.targetPosition &&
+    game.camera.targetPosition.z !== game.camera.position.z
+  ) {
+    game.camera.position.z =
+      game.camera.position.z * 0.9 + game.camera.targetPosition.z * 0.1;
+    game.camera.position.y =
+      game.camera.position.y * 0.9 + game.camera.targetPosition.y * 0.1;
   }
 
   if (getSelectedPiece()) {
@@ -162,6 +173,7 @@ animate();
 
 const fight = () => {
   console.log(game);
+  game.started = true;
   Object.values(game.pieces).forEach((piece) => piece.action());
 };
 
